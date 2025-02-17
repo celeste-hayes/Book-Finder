@@ -1,5 +1,6 @@
 import { User } from '../models/index.js';
-import { signToken, AuthenticationError } from '../services/auth.js';
+import { signToken } from '../services/auth.js';
+import { AuthenticationError } from 'apollo-server-errors';
 
 interface User {
     _id: string;
@@ -34,16 +35,16 @@ interface Context {
 const resolvers = {
     Query: {
         me: async (_parent: unknown, _args: unknown, context: Context): Promise<User | null> => {
-            if (context.user) {
-                return await User.findOne({ _id: context.user._id }).populate('savedBooks');
+            if (!context.user) {
+                throw new AuthenticationError('You need to be logged in!');
             }
-            throw new AuthenticationError('You need to be logged in!');
+            const user = await User.findOne({ _id: context.user._id }).populate('savedBooks');
+            return user as User | null;
         }
     },
     Mutation: {
-        // login a user using email or username
         login: async (_parent: unknown, { email, password }: { email: string, password: string }): Promise<{ token: string, user: User }> => {
-            const user = await User.findOne({ $or: [{ username: email }, { email: email }] });
+            const user = await User.findOne({ $or: [{ username: email }, { email }] });
             if (!user) {
                 throw new AuthenticationError(`Can't find this user`);
             }
@@ -54,38 +55,37 @@ const resolvers = {
             }
 
             const token = signToken(user.username, user.email, user._id);
-            return { token, user };
+            return { token, user: user.toObject() as User };
         },
 
-        // create a new user
-        addUser: async (_parent: unknown, { username, email, password }: {username: string, email: string, password: string}): Promise<{ token: string, user: User }> => {
+        addUser: async (_parent: unknown, { username, email, password }: { username: string, email: string, password: string }): Promise<{ token: string, user: User }> => {
             const user = await User.create({ username, email, password });
             const token = signToken(user.username, user.email, user._id);
-            return { token, user };
+            return { token, user: user.toObject() as User };
         },
 
         saveBook: async (_parent: unknown, { bookData }: SaveBookArgs, context: Context): Promise<User | null> => {
-            if(context.user) {
-                return await User.findOneAndUpdate(
-                    { _id: context.user?._id },
-                    { $addToSet: { savedBooks: bookData } },
-                    { new: true, runValidators: true }
-                );
+            if (!context.user) {
+                throw new AuthenticationError('You need to be logged in!');
             }
-            throw new AuthenticationError('You need to be logged in!');
+            return await User.findOneAndUpdate(
+                { _id: context.user._id },
+                { $addToSet: { savedBooks: bookData } },
+                { new: true, runValidators: true }
+            );
         },
 
         removeBook: async (_parent: unknown, { bookId }: RemoveBookArgs, context: Context): Promise<User | null> => {
-            if(context.user) {
-                return await User.findOneAndUpdate(
-                    { _id: context.user?._id },
-                    { $pull: { savedBooks: { bookId } } },
-                    { new: true }
-                );
+            if (!context.user) {
+                throw new AuthenticationError('You need to be logged in!');
             }
-            throw new AuthenticationError('You need to be logged in!');
+            return await User.findOneAndUpdate(
+                { _id: context.user._id },
+                { $pull: { savedBooks: { bookId } } },
+                { new: true }
+            );
         }
     }
-}
+};
 
 export default resolvers;
