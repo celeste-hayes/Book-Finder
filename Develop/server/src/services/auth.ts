@@ -27,7 +27,7 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
       return next();
     });
   } else {
-    res.sendStatus(401); // Unauthorized
+    res.sendStatus(401);
   }
 };
 
