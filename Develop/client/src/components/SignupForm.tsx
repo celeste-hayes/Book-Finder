@@ -29,19 +29,15 @@ const SignupForm = ({}: { handleModalClose: () => void }) => {
     // check if form has everything (as per react-bootstrap docs)
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
-      event.preventDefault();
       event.stopPropagation();
     }
+    console.log(userFormData);
 
     try {
-      const response = await createUser(userFormData);
-
-      if (!response.ok) {
-        throw new Error('something went wrong!');
-      }
-
-      const { token } = await response.json();
-      Auth.login(token);
+      // use the addUser mutation to add a user
+      const { data } = await addUser({variables: { ...userFormData }});
+      // use the token from the response to log the user in
+      Auth.login(data.addUser.token);
     } catch (err) {
       console.error(err);
       setShowAlert(true);
