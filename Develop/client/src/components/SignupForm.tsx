@@ -1,8 +1,9 @@
 import { useState } from 'react';
+import { useMutation } from '@apollo/client';
 import type { ChangeEvent, FormEvent } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 
-import { createUser } from '../utils/API';
+import { ADD_USER } from '../utils/mutation';
 import Auth from '../utils/auth';
 import type { User } from '../models/User';
 
@@ -10,6 +11,8 @@ import type { User } from '../models/User';
 const SignupForm = ({}: { handleModalClose: () => void }) => {
   // set initial form state
   const [userFormData, setUserFormData] = useState<User>({ username: '', email: '', password: '', savedBooks: [] });
+  // add mutation for creating a user
+  const [addUser] = useMutation(ADD_USER);
   // set state for form validation
   const [validated] = useState(false);
   // set state for alert
