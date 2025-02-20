@@ -2,15 +2,15 @@ import express from 'express';
 import path from 'node:path';
 import type { Request, Response } from 'express';
 import db from './config/connection.js'
-//import { ApolloServer } from '@apollo/server';
+import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
-//import { typeDefs, resolvers } from './schemas/index.js';
+import { typeDefs, resolvers } from './schemas/index.js';
 import { authenticateToken } from './services/auth.js';
 
-//const server = new ApolloServer({
-  //typeDefs,
-  //resolvers
-//});
+const server = new ApolloServer({
+  typeDefs,
+  resolvers
+});
 
 const startApolloServer = async () => {
   await server.start();
