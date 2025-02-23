@@ -19,11 +19,11 @@ Checkout the deployed Book Finder site on Render [here](https://drive.google.com
 - **MongoDB Database:** MongoDB Atlas is used for the database to store user data and saved books.
 
 ### Application Authentication
-![Screenshot of the Deployed Application](../02-Challenge/Assets/Authentication.png)
+![Screenshot of the Deployed Application](/Develop/client/public/Authentication.png)
 ### Search For Books
-![Screenshot of the Deployed Application](../02-Challenge/Assets/SearchForBooks.png)
+![Screenshot of the Deployed Application](/Develop/client/public/SearchForBooks.png)
 ### Saved Books
-![Screenshot of the Deployed Application](../02-Challenge/Assets/SavedBooks.png)
+![Screenshot of the Deployed Application](/Develop/client/public/SavedBooks.png)
 
 ## Installation
 1. Fork the repo to your local machine
